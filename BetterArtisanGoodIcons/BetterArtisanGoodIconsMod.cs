@@ -23,12 +23,15 @@ namespace BetterArtisanGoodIcons
             Harmony harmony = new Harmony("cat.betterartisangoodicons");
 
             //Don't need to override draw for Object because artisan goods can't be placed down.
-            Type objectType = typeof(StardewValley.Object);
+            Type objectType = typeof(ColoredObject);
             IList<Tuple<string, Type, Type>> replacements = new List<Tuple<string, Type, Type>>
             {
                 {"drawWhenHeld", objectType, typeof(Patches.SObjectPatches.DrawWhenHeldPatch)},
                 {"drawInMenu", objectType, typeof(Patches.SObjectPatches.DrawInMenuPatch)},
                 {"draw", objectType, typeof(Patches.SObjectPatches.DrawPatch)},
+                {"drawWhenHeld", typeof(StardewValley.Object), typeof(Patches.SObjectPatches.DrawWhenHeldPatch)},   // 
+                {"drawInMenu", typeof(StardewValley.Object), typeof(Patches.SObjectPatches.DrawInMenuPatch)},       // for honey, since honey is not a ColoredObject
+                {"draw", typeof(StardewValley.Object), typeof(Patches.SObjectPatches.DrawPatch)},                   // 
                 {"draw", typeof(Furniture), typeof(Patches.FurniturePatches.DrawPatch)}
             };
 

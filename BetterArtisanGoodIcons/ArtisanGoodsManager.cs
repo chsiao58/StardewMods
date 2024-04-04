@@ -11,6 +11,8 @@ namespace BetterArtisanGoodIcons
     /// <summary>Manages textures for all artisan goods.</summary>
     internal static class ArtisanGoodsManager
     {
+        public static IMonitor Monitor;
+
         /// <summary>Texture managers that get the correct texture for each item.</summary>
         private static readonly IList<ArtisanGoodTextureProvider> TextureProviders = new List<ArtisanGoodTextureProvider>();
 
@@ -20,7 +22,10 @@ namespace BetterArtisanGoodIcons
         /// <summary>Initializes the manager.</summary>
         internal static void Init(IModHelper helper, IMonitor monitor)
         {
+            Monitor = monitor;
             config = helper.ReadConfig<BetterArtisanGoodIconsConfig>();
+            Monitor.Log($"Init", LogLevel.Trace);
+
 
             foreach (ArtisanGoodTextureProvider provider in ContentSourceManager.GetTextureProviders(helper, monitor))
                 TextureProviders.Add(provider);
@@ -37,6 +42,7 @@ namespace BetterArtisanGoodIcons
             {
                 if (manager.GetDrawInfo(output, ref textureSheet, ref mainPosition, ref iconPosition))
                 {
+//                    Monitor.Log($"ArtisanGoodTextureProvider GetDrawInfo succeed", LogLevel.Trace);
                     if (config.DisableSmallSourceIcons)
                         iconPosition = Rectangle.Empty;
                     return true;

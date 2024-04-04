@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
+using StardewValley.GameData.Objects;
 using System.Collections.Generic;
 using SObject = StardewValley.Object;
 
@@ -40,7 +41,7 @@ namespace BetterArtisanGoodIcons
         }
 
         /// <summary>Gets the name of the source item used to create the given item.</summary>
-        private bool GetSourceName(SObject item, int sourceIndex, out string sourceName)
+        private bool GetSourceName(SObject item, string sourceIndex, out string sourceName)
         {
             //If the item name is equivalent to the base good, return _Base.
             if (item.Name == this.good.ToString())
@@ -50,9 +51,9 @@ namespace BetterArtisanGoodIcons
             }
 
             //Lookup the name from the game's object information, or null if not found (a custom item that has its sourceIndex set incorrectly).
-            if (Game1.objectInformation.TryGetValue(sourceIndex, out string information))
+            if (Game1.objectData.TryGetValue(sourceIndex, out ObjectData information))
             {
-                sourceName = information.Split('/')[0];
+                sourceName = information.Name;
                 return true;
             }
 
@@ -61,52 +62,41 @@ namespace BetterArtisanGoodIcons
         }
 
         /// <summary>Gets the index of the source item used to create the given item name.</summary>
-        private bool GetIndexOfSource(SObject item, out int index)
+        private bool GetIndexOfSource(SObject item, out string index)
         {
             //Use preservedParentSheetIndex for wine, jelly, pickles, and juice
-            if (item.preservedParentSheetIndex.Value != 0)
+            if (item.preservedParentSheetIndex.Value != null)
             {
                 index = item.preservedParentSheetIndex.Value;
                 return true;
             }
 
-            //Use honeyType for honey
-            //Hardcode Wild honey using the sunflower image, since it is not called "Sunflower honey"
-            if (this.good == ArtisanGood.Honey && item.honeyType.Value.HasValue)
-            {
-                index = item.honeyType.Value.Value != SObject.HoneyType.Wild ? (int)item.honeyType.Value.Value : 421;
-                return true;
-            }
-
-            index = -1;
+            index = null;
             return false;
         }
 
         /// <summary>Gets the info needed to draw the right texture for the given item.</summary>
         internal bool GetDrawInfo(SObject item, ref Texture2D textureSheet, ref Rectangle mainPosition, ref Rectangle iconPosition)
         {
-            //TODO: This actually disallows changing the base texture b/c it won't get past the second if statement,
-            //TODO: also the != -1 check will also be false.
+            //TODO: This actually disallows changing the base texture b/c it won't get past the second if statement, <-- TODO: check if this is still relevent
+            //TODO: also the != -1 check will also be false. <-- TODO: check if this is still relevent
 
             //Only yield new textures for base items. If removed, everything *should* still work, but it needs more testing.
             if (item.ParentSheetIndex != (int)this.good)
                 return false;
 
             //If the index of the source item can't be found, exit.
-            if (!this.GetIndexOfSource(item, out int sourceIndex))
+            if (!this.GetIndexOfSource(item, out string sourceIndex))
                 return false;
 
-            //CFR likes to set the preservedParentSheetIndex to the negative of the source parentSheetIndex, for some reason.
-            if (sourceIndex < 0)
-                sourceIndex *= -1;
-
             //Get the name of the item from its index, and from that, a new sprite.
-            if (!this.GetSourceName(item, sourceIndex, out string sourceName) || !this.positions.TryGetValue(sourceName, out mainPosition))
+            string sourceName = ItemRegistry.GetDataOrErrorItem("(O)" + item.preservedParentSheetIndex.Value).InternalName;
+            if (!this.positions.TryGetValue(sourceName, out mainPosition))
                 return false;
 
             textureSheet = this.spriteSheet;
-            iconPosition = sourceIndex != -1
-                ? Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet, sourceIndex, 16, 16)
+            iconPosition = sourceIndex != null
+                ? Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet, int.Parse(sourceIndex), 16, 16)
                 : Rectangle.Empty;
             return true;
         }
