@@ -18,9 +18,8 @@ namespace BetterArtisanGoodIcons.Patches.SObjectPatches
             //By popular demand, don't show icons when held.
             //if (iconPosition != Rectangle.Empty)
             //    spriteBatch.Draw(Game1.objectSpriteSheet, objectPosition + new Vector2(1, 1), new Microsoft.Xna.Framework.Rectangle?(iconPosition), Color.White, 0.0f, new Vector2(4f, 4f), Game1.pixelZoom / 2, SpriteEffects.None, Math.Max(0.0f, (f.getStandingY() + 2) / 10000f));
-            spriteBatch.Draw(spriteSheet, objectPosition, position, Color.White, 0.0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, Math.Max(0.0f, (f.StandingPixel.Y + 2) / 10000f));
-//            spriteBatch.Draw(spriteSheet, objectPosition, position, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, Math.Max(0f, (float)(f.StandingPixel.Y + 3) / 10000f));
 
+            spriteBatch.Draw(spriteSheet, objectPosition, position, Color.White, 0.0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, Math.Max(0.0f, (f.StandingPixel.Y + 2) / 10000f));
             return false;
         }
     }
